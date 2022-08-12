@@ -38,5 +38,9 @@
   "license": "MIT License",
   "stackblitz": {
     "startCommand": "npm start"
+  },
+  "env": {
+    "HOST": "node-adshxm--8000.local.webcontainer.io",
+    "PORT": "8000"
   }
 }
