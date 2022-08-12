@@ -2,7 +2,10 @@
   "name": "node-p2p-chord",
   "version": "0.5.1",
   "description": "A light-weight Chord protocol implementation for a peer-to-peer distributed hash table.",
-  "keywords": ["chord", "p2p"],
+  "keywords": [
+    "chord",
+    "p2p"
+  ],
   "author": "jollen <jollen@jollen.org> (http://jollen.org/)",
   "main": "libs/server.js",
   "repository": {
@@ -18,6 +21,8 @@
     "coap": "^0.10.3",
     "codecov": "^1.0.1",
     "console.table": "^0.7.0",
+    "express": "^4.18.1",
+    "http": "*",
     "underscore": "^1.8.3",
     "util": "^0.10.3",
     "utils-merge": "^1.0.0",
@@ -40,7 +45,7 @@
     "startCommand": "npm start"
   },
   "env": {
-    "HOST": "node-adshxm--8000.local.webcontainer.io",
-    "PORT": "8000"
+    "HOST": "localhost",
+    "PORT": "5000"
   }
 }

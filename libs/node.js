@@ -75,6 +75,9 @@ function Node(id, server) {
 
   this.next_finger = 0;
 
+  // key value store
+  this.hashtable = [];
+
   console.info('node id = ' + this.id);
   console.info('successor = ' + JSON.stringify(this.successor));
 }
@@ -299,4 +302,13 @@ Node.prototype.dispatch = function (_from, _message) {
       console.error('Unknown Chord message: ' + message.type);
       break;
   }
+};
+
+Node.prototype.get = function (key) {
+  return this.hashtable[key] ?? false;
+};
+
+Node.prototype.put = function (key, value) {
+  this.hashtable[key] = value;
+  return { success: true };
 };

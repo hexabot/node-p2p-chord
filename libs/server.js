@@ -3,7 +3,7 @@
  * The MIT License (MIT)
  *
  * https://www.flowchain.co
- * 
+ *
  * Copyright (c) 2016-present Jollen
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -12,10 +12,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -46,10 +46,10 @@ var ChordUtils = require('./utils');
 /**
  * Server Modules
  */
-var Framework = WoT.Framework
-  , WebsocketBroker = WoT.WebsocketBroker
-  , WebsocketRouter = WoT.WebsocketRouter
-  , RequestHandlers = WoT.WebsocketRequestHandlers;
+var Framework = WoT.Framework,
+  WebsocketBroker = WoT.WebsocketBroker,
+  WebsocketRouter = WoT.WebsocketRouter,
+  RequestHandlers = WoT.WebsocketRequestHandlers;
 
 /**
  * Util Modules
@@ -65,12 +65,11 @@ var WebSocketClient = require('websocket').client;
 var serialize = JSON.stringify;
 var deserialize = JSON.parse;
 
-
 /**
  * WebSocket URL Router
  */
 var wsHandlers = {
-   "/node/([A-Za-z0-9-]+)/receive": RequestHandlers.receive
+  '/node/([A-Za-z0-9-]+)/receive': RequestHandlers.receive,
 };
 
 /*
@@ -79,21 +78,20 @@ var wsHandlers = {
  * @param {Object} Chord server
  */
 function Server() {
-  this.port = process.env.PORT || 8000;
+  this.port = process.env.PORT || 5000;
   this.host = process.env.HOST || 'localhost';
 
   this.nodes = {};
 
   /*
    * Create a unique ID for the new node.
-   * 
+   *
    *  1. The ID of the node can be hashed by IP address.
    *  2. Hased by URI at this project.
    */
   if (process.env.ENV === 'development')
     var id = ChordUtils.hashTestId(process.env.ID);
-  else
-    var id = ChordUtils.hash(uuid.v4());
+  else var id = ChordUtils.hash(uuid.v4());
 
   // Create a new Chord node with the ID
   var node = new Node(id, this);
@@ -101,12 +99,12 @@ function Server() {
   // The Node instances
   this.node = this.nodes[id] = node;
   this.last_node = id;
-};
+}
 
 /**
  * The server event handlers
  */
-Server.prototype.onData = function(payload) {
+Server.prototype.onData = function (payload) {
   // Parse the data received from Chord node (WebSocket client)
   var packet = deserialize(payload.data);
 
@@ -114,12 +112,14 @@ Server.prototype.onData = function(payload) {
   var pathname = payload.pathname;
 
   // The message is for me
-  if (typeof this._options.onmessage === 'function' &&
-    packet.message.type === Node.MESSAGE) {
+  if (
+    typeof this._options.onmessage === 'function' &&
+    packet.message.type === Node.MESSAGE
+  ) {
     return this._options.onmessage(payload);
   }
 
-  /* 
+  /*
    * Format of 'packet'.
    *
    *  { message: { type: 0, id: '77c44c4f7bd4044129babdf235d943ff25a1d5f0' },
@@ -147,32 +147,34 @@ Server.prototype.onData = function(payload) {
  * @return {None}
  * @api public
  */
-Server.prototype.start = function(options) {
+Server.prototype.start = function (options) {
   var options = options || {};
 
   for (var prop in options) {
-    if (options.hasOwnProperty(prop) 
-        && typeof(this._options[prop]) === 'undefined')
+    if (
+      options.hasOwnProperty(prop) &&
+      typeof this._options[prop] === 'undefined'
+    )
       this._options[prop] = options[prop];
   }
 
   // Prepare to start Websocket server
   var server = new WebsocketBroker({
     port: this.port,
-    host: this.host
+    host: this.host,
   });
 
   var router = new WebsocketRouter();
 
   // Start the protocol layer.
-  server.on('data', this.onData.bind(this));  
+  server.on('data', this.onData.bind(this));
 
   // Join existing node
   if (typeof options.join === 'object') {
     this.node.join(options.join);
     this.node.startUpdateFingers();
 
-  // Create virtual node
+    // Create virtual node
   } else {
     this.node.startUpdateFingers();
   }
@@ -190,17 +192,21 @@ Server.prototype.start = function(options) {
  */
 var connections = [];
 
-Server.prototype.sendChordMessage = function(to, packet) {
-  var uri = util.format('ws://%s:%s/node/%s/receive', to.address, to.port, packet.message.id);
+Server.prototype.sendChordMessage = function (to, packet) {
+  var uri = util.format(
+    'ws://%s:%s/node/%s/receive',
+    to.address,
+    to.port,
+    packet.message.id
+  );
   var host = util.format('ws://%s:%s', to.address, to.port);
   var payload = {
     message: packet.message,
-    from: packet.from
+    from: packet.from,
   };
   var connection = connections[host] || null;
 
-  if (ChordUtils.DebugServer)
-    console.info('send to ' + uri);
+  if (ChordUtils.DebugServer) console.info('send to ' + uri);
 
   if (connection) {
     if (connection.connected) {
@@ -214,7 +220,7 @@ Server.prototype.sendChordMessage = function(to, packet) {
 
   var client = new WebSocketClient();
 
-  client.on('connect', function(connection) {
+  client.on('connect', function (connection) {
     if (connection.connected) {
       connection.sendUTF(JSON.stringify(payload));
       connections[host] = connection;
@@ -226,6 +232,25 @@ Server.prototype.sendChordMessage = function(to, packet) {
   client.connect(uri, '');
 };
 
+Server.prototype.lookup = function (key) {
+  var hash = ChordUtils.hash(key),
+    node = this.node.closet_finger_preceding(hash);
+  return node;
+};
+
+// https://node-adshxm--8000.local.webcontainer.io/api/put?key=test&value=123
+Server.prototype.message = function (to, msg) {
+  // this.node.send(this.node, msg, to);
+  this.sendChordMessage(to, {
+    message: {
+      id: to.id,
+      type: 5,
+      content: msg,
+    },
+    from: this.node.id,
+  });
+};
+
 /**
  * Create the server instance and connect to a subsequent Chord node
  */
@@ -235,7 +260,7 @@ var server = new Server();
  * Combined server with framework instance.
  */
 var wsServer = new Framework({
-	server: server
+  server: server,
 });
 
 /**

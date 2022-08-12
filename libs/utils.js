@@ -30,10 +30,9 @@
 
 var Utils = {
   DebugVerbose: false,
-
   DebugNodeJoin: false,
   DebugFixFingers: false,
-  DebugServer: false,
+  DebugServer: true,
   DebugSuccessor: false,
   DebugPredecessor: false,
 
