@@ -2,10 +2,7 @@
   "name": "node-p2p-chord",
   "version": "0.5.1",
   "description": "A light-weight Chord protocol implementation for a peer-to-peer distributed hash table.",
-  "keywords": [
-    "chord",
-    "p2p"
-  ],
+  "keywords": ["chord", "p2p"],
   "author": "jollen <jollen@jollen.org> (http://jollen.org/)",
   "main": "libs/server.js",
   "repository": {
@@ -31,12 +28,15 @@
   },
   "scripts": {
     "test": "./node_modules/.bin/vows tests/tests.js --spec",
-    "start": "node ./websocket-broker-server.js"
+    "start": "node ./node0.js"
   },
   "devDependencies": {
     "codecov": "^1.0.1",
     "mocha": "^2.4.5",
     "twilio": "^2.9.0"
   },
-  "license": "MIT License"
+  "license": "MIT License",
+  "stackblitz": {
+    "startCommand": "npm start"
+  }
 }
